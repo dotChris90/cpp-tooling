@@ -1,0 +1,1 @@
+export {ITextOutput} from './i-text-output';
