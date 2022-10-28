@@ -1,6 +1,6 @@
 {
   "name": "@dotchris90/cpp-tooling",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "API to access conan, cmake, dot, doxygen, etc.",
   "main": "dist/cpp-tooling.js",
   "umd:main": "dist/cpp-tooling.umd.js",
