@@ -1,6 +1,6 @@
 {
   "name": "@dotchris90/cpp-tooling",
-  "version": "0.1.0",
+  "version": "0.0.3",
   "description": "API to access conan, cmake, dot, doxygen, etc.",
   "main": "dist/cpp-tooling.js",
   "umd:main": "dist/cpp-tooling.umd.js",
@@ -9,6 +9,7 @@
     "dist",
     "readme.md"
   ],
+  "types": "dist/index.d.ts",
   "dependencies": {},
   "devDependencies": {
     "@types/jest": "^26.0.14",
@@ -29,6 +30,7 @@
     "typescript": "^4.0.3"
   },
   "scripts": {
+    "prepublish": "npm run build",
     "build": "microbundle -o dist/ --sourcemap false --compress false",
     "dev": "microbundle watch -o dist/ --sourcemap false --compress false",
     "test": "jest --coverage",
