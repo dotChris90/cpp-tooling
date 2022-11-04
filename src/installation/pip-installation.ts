@@ -2,6 +2,7 @@ import * as command_exists from 'command-exists';
 
 import { Executor } from "../executor";
 import { InstallationStrategie } from "./installation-strategie";
+import { ValidationError } from '../Error/validation-error';
 
 export class PipInstallation implements InstallationStrategie {
     
@@ -10,12 +11,18 @@ export class PipInstallation implements InstallationStrategie {
     validateFunctionality(): void {
         let cmdExists = false;
         if (command_exists.sync("pip3")) {
-            const version = this.exec.execSyncGetFormatStdout("pip3 --version")[0].split(".");
+            const version = this.exec.execSyncGetFormatStdout("pip3",["--version"])[0].split(" ")[1].split(".");
             const major = version[0] as unknown as number;
             const minor = version[1] as unknown as number;
             if (major >= 20 && minor >= 0 ) {
                 cmdExists = true;
             }
+        }
+        if (cmdExists) {
+            // pass 
+        }
+        else {
+            throw new ValidationError("pip3 command is missing - please install manually");
         }
     }
 
