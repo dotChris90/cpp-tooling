@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-ternary */
 
 import { ConanInstallation } from "./installation/conan-installation";
 import { PipInstallation } from "./installation/pip-installation";
@@ -5,7 +6,6 @@ import { InstallationStrategie } from "./installation/installation-strategie";
 import { Executor } from "./executor";
 import { ITextOutput } from "./i-text-output";
 import { InstallationPkg } from "./installation/installation-pkg";
-import { ValidationError } from "./Error/validation-error";
 
 export class Installer {
 
@@ -39,7 +39,7 @@ export class Installer {
         
     }
 
-    public installPkg(pkg : InstallationPkg) : void {
+    public async installPkg(pkg : InstallationPkg) : Promise<void> {
         if (["pip3","conan"].includes(pkg.installStrategy)) {
             if (pkg.location === "global") {
                 this.strategies.get(pkg.installStrategy).installGlobal(

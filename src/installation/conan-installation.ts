@@ -30,17 +30,17 @@ export class ConanInstallation implements InstallationStrategie {
         this.exec = exec;
     }
     
-    installGlobal(name : string, version : string): void {
+    installGlobal(name : string, version : string): Promise<void> {
         const cmd = "conan";
         const args = [
             "install", 
             `${name}/${version}@_/_`,
             "--build=missing"
         ];
-        this.exec.execSync(cmd,args);
+        return this.exec.execAsync(cmd,args);
     }
 
-    installIAtLocation(name : string, version : string, location : string) : void {
+    installIAtLocation(name : string, version : string, location : string) : Promise<void> {
         const cmd = "conan";
         const args = [
             "install", 
@@ -49,6 +49,6 @@ export class ConanInstallation implements InstallationStrategie {
             `${name}/${version}@_/_`,
             "--build=missing"
         ];
-        this.exec.execSync(cmd,args);
+        return this.exec.execAsync(cmd,args);
     }
 }

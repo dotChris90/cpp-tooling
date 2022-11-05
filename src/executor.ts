@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/dot-notation */
+/* eslint-disable no-param-reassign */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable prefer-arrow-callback */
+/* eslint-disable func-names */
 /* eslint-disable unicorn/no-object-as-default-parameter */
 import * as child_process from 'child_process';
 import { ITextOutput } from './i-text-output';
@@ -48,13 +53,12 @@ export class Executor {
     command: string, 
     args: string[], 
     workingDir = "", 
-    options : child_process.ExecSyncOptionsWithStringEncoding = {encoding : "utf8"}
-    ) : Promise<void> {
-    const workingDir2 = workingDir === "" ? process.cwd() : workingDir;
-    const options2 = options;
+    options: any = {}
+    ) : Promise<any> {
+    workingDir = workingDir === "" ? process.cwd() : workingDir;
     return new Promise((resolve, reject) => {
-      options2.cwd = workingDir2;
-      options2.shell = "true";
+      options['cwd'] = workingDir;
+      options['shell'] = true;
       const commandProc = child_process.spawn(command, args, options);
       commandProc.stdout.on("data", (data) => {
         this.output.writeOut(data.toString());
@@ -62,10 +66,12 @@ export class Executor {
       commandProc.stderr.on("data", (data) => {
         this.output.writeErr(data.toString());
       });
-      commandProc.on('exit', () => {
-  
+      commandProc.on('exit', function (code) {
+        // *** Process completed
+        resolve(code);
       });
-      commandProc.on('error', (err) => {
+      commandProc.on('error', function (err) {
+        // *** Process creation failed
         reject(err);
       });
     });

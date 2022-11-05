@@ -28,7 +28,7 @@ export class ToolManager {
         this.toolInstallPath = toolInstallPath;
     }
 
-    protected async checkToolExist(toolcommand : string) : Promise<boolean> {
+    protected checkToolExist(toolcommand : string) : boolean {
         let toolsIsPresent = false;
         let searchPattern = `${path.sep}${toolcommand}`;
         if (os.platform() === "win32") {
@@ -49,20 +49,20 @@ export class ToolManager {
 
     public async installAllTools() : Promise<void> {
         // metrixpp 1.7.1 pip3 
-        if (await this.checkToolExist("metrix++")) {
+        if (this.checkToolExist("metrix++")) {
             // pass 
         }
         else {
-            const cmakePkg = new InstallationPkg();
-            cmakePkg.installStrategy = "pip3";
-            cmakePkg.location = this.toolInstallPath;
-            cmakePkg.name = "metrixpp";
-            cmakePkg.version = "1.7.1";
-            this.inst.installPkg(cmakePkg);
+            const metrixPkg = new InstallationPkg();
+            metrixPkg.installStrategy = "pip3";
+            metrixPkg.location = this.toolInstallPath;
+            metrixPkg.name = "metrixpp";
+            metrixPkg.version = "1.7.1";
+            this.inst.installPkg(metrixPkg);
         }
         
         // cmake','3.23.1
-        if (await this.checkToolExist("cmake")) {
+        if (this.checkToolExist("cmake")) {
             // pass 
         }
         else {
@@ -75,29 +75,29 @@ export class ToolManager {
         }
 
         // cppcheck','2.7.5
-        if (await this.checkToolExist("cppcheck")) {
+        if (this.checkToolExist("cppcheck")) {
             // pass 
         }
         else {
-            const cmakePkg = new InstallationPkg();
-            cmakePkg.installStrategy = "conan";
-            cmakePkg.location = this.toolInstallPath;
-            cmakePkg.name = "cppcheck";
-            cmakePkg.version = "2.7.5";
-            this.inst.installPkg(cmakePkg);
+            const cppcheckPkg = new InstallationPkg();
+            cppcheckPkg.installStrategy = "conan";
+            cppcheckPkg.location = this.toolInstallPath;
+            cppcheckPkg.name = "cppcheck";
+            cppcheckPkg.version = "2.7.5";
+            this.inst.installPkg(cppcheckPkg);
         }
 
         // doxygen','1.9.1
-        if (await this.checkToolExist("doxygen")) {
+        if (this.checkToolExist("doxygen")) {
             // pass 
         }
         else {
-            const cmakePkg = new InstallationPkg();
-            cmakePkg.installStrategy = "conan";
-            cmakePkg.location = this.toolInstallPath;
-            cmakePkg.name = "doxygen";
-            cmakePkg.version = "1.9.1";
-            this.inst.installPkg(cmakePkg);
+            const doxygenPkg = new InstallationPkg();
+            doxygenPkg.installStrategy = "conan";
+            doxygenPkg.location = this.toolInstallPath;
+            doxygenPkg.name = "doxygen";
+            doxygenPkg.version = "1.9.1";
+            this.inst.installPkg(doxygenPkg);
         }
     }
 

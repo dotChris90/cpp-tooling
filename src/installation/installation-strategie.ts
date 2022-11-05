@@ -6,7 +6,7 @@ export interface InstallationStrategie {
 
     setExecutor( exec : Executor) : void;
 
-    installIAtLocation(name : string, version : string, path : string) : void;
+    installIAtLocation(name : string, version : string, path : string) : Promise<void>;
 
-    installGlobal(name : string, version : string) : void;
+    installGlobal(name : string, version : string) : Promise<void>;
 }
