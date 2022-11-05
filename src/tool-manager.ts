@@ -47,7 +47,8 @@ export class ToolManager {
         return toolsIsPresent;
     }
 
-    public async installAllTools() : Promise<void> {
+    public async installMetrixpp() : Promise<void> {
+        let result = Promise.resolve();
         // metrixpp 1.7.1 pip3 
         if (this.checkToolExist("metrix++")) {
             // pass 
@@ -58,9 +59,14 @@ export class ToolManager {
             metrixPkg.location = this.toolInstallPath;
             metrixPkg.name = "metrixpp";
             metrixPkg.version = "1.7.1";
-            this.inst.installPkg(metrixPkg);
+            result = this.inst.installPkg(metrixPkg);
         }
-        
+        return result;
+    }
+
+    public async installCMake() : Promise<void> {
+
+        let result = Promise.resolve();
         // cmake','3.23.1
         if (this.checkToolExist("cmake")) {
             // pass 
@@ -70,12 +76,15 @@ export class ToolManager {
             cmakePkg.installStrategy = "conan";
             cmakePkg.location = this.toolInstallPath;
             cmakePkg.name = "cmake";
-            cmakePkg.version = "3.23.1";
-            this.inst.installPkg(cmakePkg);
+            result = this.inst.installPkg(cmakePkg);
         }
+        return result;
+    }
 
+    public async installCppCheck() : Promise<void> {
+        let result = Promise.resolve();
         // cppcheck','2.7.5
-        if (this.checkToolExist("cppcheck")) {
+         if (this.checkToolExist("cppcheck")) {
             // pass 
         }
         else {
@@ -84,9 +93,13 @@ export class ToolManager {
             cppcheckPkg.location = this.toolInstallPath;
             cppcheckPkg.name = "cppcheck";
             cppcheckPkg.version = "2.7.5";
-            this.inst.installPkg(cppcheckPkg);
+            result = this.inst.installPkg(cppcheckPkg);
         }
+        return result;
+    }
 
+    public async installDoxygen() : Promise<void> {
+        let result = Promise.resolve();
         // doxygen','1.9.1
         if (this.checkToolExist("doxygen")) {
             // pass 
@@ -97,8 +110,18 @@ export class ToolManager {
             doxygenPkg.location = this.toolInstallPath;
             doxygenPkg.name = "doxygen";
             doxygenPkg.version = "1.9.1";
-            this.inst.installPkg(doxygenPkg);
+            result = this.inst.installPkg(doxygenPkg);
         }
+        return result;
+    }
+
+    public async installAllTools() : Promise<void[]> {
+        return Promise.all([
+            this.installMetrixpp(),
+            this.installCMake(),
+            this.installCppCheck(),
+            this.installDoxygen()
+        ]);
     }
 
 }
