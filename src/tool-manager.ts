@@ -28,6 +28,12 @@ export class ToolManager {
         this.toolInstallPath = toolInstallPath;
     }
 
+    public async setup() : Promise<void> {
+
+        await this.inst.setup();
+        
+    } 
+
     protected checkToolExist(toolcommand : string) : boolean {
         let toolsIsPresent = false;
         let searchPattern = `${path.sep}${toolcommand}`;

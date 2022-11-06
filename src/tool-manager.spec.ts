@@ -13,15 +13,19 @@ import { ToolManager } from './tool-manager';
 describe('textout', () => {
     describe('test', () => {
         it('tools shall be present', async() => {
+            jest.setTimeout(10 * 60 * 1000)
+            
             const out = new FakeOut();
 
             const appPrefix = "tool_testing";
             const tmpDir = fse.mkdtempSync(path.join(os.tmpdir(), appPrefix));
             fse.mkdirpSync(tmpDir);
             const manager = new ToolManager(out,tmpDir);
+            await manager.setup();
+
             await manager.installCMake().then(
                 () => {
-                    fse.rm(tmpDir);
+                    expect(1).toBe(1);
                 }
             )
             
