@@ -47,6 +47,11 @@ describe('exec', () => {
             const out = new FakeOut();
             const exec = new Executor(out);
 
+            exec.execSync("pip3",[
+                "install",
+                "conan"
+            ]);
+
             const tmpDir = fse.mkdtempSync(path.join(os.tmpdir(), "exec_"));
             fse.mkdirpSync(tmpDir);
             
