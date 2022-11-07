@@ -65,6 +65,12 @@ describe('exec', () => {
             ];
             // eslint-disable-next-line promise/catch-or-return
             await exec.execAsync(cmd,args,tmpDir);
+
+            console.log("Out----------------------------------------------------");
+            console.log(out.bufferOut);
+            console.log("Err----------------------------------------------------");
+            console.log(out.bufferErr);
+            console.log(fse.readdirSync(tmpDir));
             
             expect(fse.existsSync(path.join(tmpDir,"deploy_manifest.txt"))).toBeTruthy();
 
