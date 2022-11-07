@@ -40,7 +40,7 @@ describe('exec', () => {
         });
         
 
-        it('conan pkg shall be deployed', () => {
+        it('conan pkg shall be deployed', async() => {
 
             jest.setTimeout(100000);
 
@@ -64,14 +64,11 @@ describe('exec', () => {
                 "--build=missing"
             ];
             // eslint-disable-next-line promise/catch-or-return
-            exec.execAsync(cmd,args,tmpDir).then(
-                // eslint-disable-next-line promise/always-return
-                () => {
-                    //expect(out.bufferErr.length).toBe(0);
-                    //expect(fse.existsSync(path.join(tmpDir,"deploy_manifest.txt"))).toBeTruthy();
-                    expect(1).toBe(1);
-                }
-            );
+            await exec.execAsync(cmd,args,tmpDir);
+            
+            expect(fse.existsSync(path.join(tmpDir,"deploy_manifest.txt"))).toBeTruthy();
+
+            fse.rm(tmpDir,{recursive : true});
 
             expect(1).toBe(1);
         });

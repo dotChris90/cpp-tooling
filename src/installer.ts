@@ -49,7 +49,6 @@ export class Installer {
             conan.setExecutor(exec);
             conan.validateFunctionality();
             this.strategies.set("conan",conan);
-            
         }
         
     }
