@@ -7,6 +7,7 @@ import * as fse from 'fs-extra';
 
 import { Executor } from './executor';
 import { FakeOut } from './i-text-output-buffer';
+import commandExists from 'command-exists';
 
 describe('exec', () => {
     describe('test', () => {
@@ -47,10 +48,13 @@ describe('exec', () => {
             const out = new FakeOut();
             const exec = new Executor(out);
 
-            exec.execSync("pip3",[
+            await exec.execAsync("pip3",[
                 "install",
                 "conan"
             ]);
+
+            console.log("--------------------------cmd exist------------------")
+            console.log(commandExists.sync("conan"));
 
             const tmpDir = fse.mkdtempSync(path.join(os.tmpdir(), "exec_"));
             fse.mkdirpSync(tmpDir);
