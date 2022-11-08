@@ -44,7 +44,7 @@ export class Installer {
             conan.validateFunctionality();
             this.strategies.set("conan",conan);
         } catch {
-            await pip3.installGlobal("conan","1.50.0");
+            await pip3.installGlobal("conan","1.54.0");
             const conan = new ConanInstallation();
             conan.setExecutor(exec);
             conan.validateFunctionality();

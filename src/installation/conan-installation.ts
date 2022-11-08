@@ -8,6 +8,7 @@ export class ConanInstallation implements InstallationStrategie {
 
     validateFunctionality(): void {
         let cmdExists = false;
+        let versionIsWrong = false;
         if (command_exists.sync("conan")) {
             const version = this.exec.execSyncGetFormatStdout("conan",["--version"])[0].split(" ")[2].split(".");
             const major = version[0] as unknown as number;
@@ -15,9 +16,15 @@ export class ConanInstallation implements InstallationStrategie {
             if (major >= 1 && minor >= 50 ) {
                 cmdExists = true;
             }
+            else {
+                cmdExists = true;
+                versionIsWrong = true;
+            }
         }
         if (cmdExists) {
-            // pass 
+            if (versionIsWrong) {
+                throw new ValidationError("conan command is too old - please upgrade to 1.54.0");
+            }
         }
         else {
             throw new ValidationError("conan command is missing - please install manually");

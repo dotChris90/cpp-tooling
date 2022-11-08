@@ -23,13 +23,14 @@ describe('textout', () => {
             const manager = new ToolManager(out,tmpDir);
             await manager.setup();
 
-            await manager.installCMake().then(
-                () => {
-                    expect(1).toBe(1);
-                }
-            )
+            await manager.installCMake();
+
+            console.log("---------------------------------tool-manager out -------------")
+            console.log(out.bufferOut);
             
-            expect(1).toBe(1);
+            expect(out.bufferErr.length).toBe(0);
+            expect(out.bufferOut.length).not.toBe(0);
+
         });
     });
 });

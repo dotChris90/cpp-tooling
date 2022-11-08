@@ -17,16 +17,19 @@ export class ToolManager {
     
     protected toolInstallPath : string;
 
+    protected out : ITextOutput;
+
     constructor(
         out : ITextOutput, 
         toolInstallPath = path.join(process.cwd(),".tools")
         ) {
-        this.inst = new Installer(out);
-        if (!fs.existsSync(toolInstallPath)) {
-            throw new Error("Path does not exist");
+            this.out = out;
+            this.inst = new Installer(this.out);
+            if (!fs.existsSync(toolInstallPath)) {
+                throw new Error("Path does not exist");
+            }
+            this.toolInstallPath = toolInstallPath;
         }
-        this.toolInstallPath = toolInstallPath;
-    }
 
     public async setup() : Promise<void> {
 
@@ -58,6 +61,7 @@ export class ToolManager {
         // metrixpp 1.7.1 pip3 
         if (this.checkToolExist("metrix++")) {
             // pass 
+            this.out.writeOut("metrix++ already present.");
         }
         else {
             const metrixPkg = new InstallationPkg();
@@ -76,6 +80,7 @@ export class ToolManager {
         // cmake','3.23.1
         if (this.checkToolExist("cmake")) {
             // pass 
+            this.out.writeOut("cmake already present.");
         }
         else {
             const cmakePkg = new InstallationPkg();
@@ -92,6 +97,7 @@ export class ToolManager {
         // cppcheck','2.7.5
          if (this.checkToolExist("cppcheck")) {
             // pass 
+            this.out.writeOut("cppcheck already present.");
         }
         else {
             const cppcheckPkg = new InstallationPkg();
@@ -109,6 +115,7 @@ export class ToolManager {
         // doxygen','1.9.1
         if (this.checkToolExist("doxygen")) {
             // pass 
+            this.out.writeOut("doxygen already present.");
         }
         else {
             const doxygenPkg = new InstallationPkg();
