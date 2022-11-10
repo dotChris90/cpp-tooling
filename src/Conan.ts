@@ -1,3 +1,8 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable prefer-template */
+/* eslint-disable unicorn/no-for-loop */
+/* eslint-disable no-var */
+/* eslint-disable vars-on-top */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable unicorn/prefer-ternary */
 /* eslint-disable unicorn/prefer-string-slice */
@@ -7,6 +12,7 @@
 /* eslint-disable unicorn/prefer-negative-index */
 /* eslint-disable unicorn/prefer-spread */
 /* eslint-disable unicorn/import-style */
+
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
@@ -220,7 +226,7 @@ export class Conan {
 
         const workDir = process.cwd();
 
-        return this.exec.exec(cmd, args, workDir);
+        return this.exec.execAsync(cmd, args, workDir);
     }
 
     public async getPkgDependencies(
@@ -251,20 +257,21 @@ export class Conan {
         return packages;
     }
 
-    public async getProjectRequirementsSync(projDir : string) {
+    public async getProjectRequirementsSync(
+        conanfileDir : string) : Promise<string[]> {
 
-        let pkgName = this.getNameSync(".",projDir);
-        let version = this.getVersionSync(".",projDir);
-        let cmd = "conan";
-        let args = [
+        const pkgName = await this.getPkgNameAsync(conanfileDir);
+        const version = await this.getPkgVersionAsync(conanfileDir);
+        const cmd = "conan";
+        const args = [
                 "info",
                 ".",
                 "-n",
                 "requires"
             ];
-        let out = await this.exec.execWithResult(cmd,args,projDir);   
+        const out = await this.exec.execSyncGetFormatStdout(cmd,args,conanfileDir);   
         let pkgIdx = out.indexOf(`conanfile.py (${pkgName}/${version})`) + 2; 
-        let packages = [];
+        const packages = [];
         while (pkgIdx < out.length) {
             packages.push(out[pkgIdx].trim().trimEnd());
             pkgIdx++;
@@ -378,15 +385,16 @@ export class Conan {
         return !(anwser.startsWith("There are no packages matching the"));
     }
 
-    public async getPackageTargets(
+    public async getPkgTargets(
         packageName : string,
         outFile : string
     ) : Promise<Map<string,string[]>> {
-        let conanfilePath = path.join(fse.mkdtempSync(path.join(os.tmpdir(), 'targetDetermination-')),"conanfile.py");
-        let randomPkgName = path.basename(path.dirname(conanfilePath));
 
-       let outMap : Map<string,string[]> = new  Map<string,string[]>();
-       let conanfileContent = `from json import tool
+        const conanfilePath = path.join(fse.mkdtempSync(path.join(os.tmpdir(), 'targetDetermination-')),"conanfile.py");
+        const randomPkgName = path.basename(path.dirname(conanfilePath));
+
+       const outMap : Map<string,string[]> = new  Map<string,string[]>();
+       const conanfileContent = `from json import tool
 from conans import ConanFile
 from conans import tools
 from conan.tools.cmake import CMakeToolchain, CMake, CMakeDeps
@@ -435,7 +443,7 @@ class AbcConan(ConanFile):
         self.cpp_info.libs = tools.collect_libs(self)`.replace("BLABLABLA",randomPkgName)
                                                       .replace("BLUBLU",packageName);
             fse.writeFileSync(conanfilePath,conanfileContent);
-            let buildDir = path.join(path.dirname(conanfilePath),"build");
+            const buildDir = path.join(path.dirname(conanfilePath),"build");
             fse.mkdirpSync(buildDir);
 
             let cmd = "conan";
@@ -445,60 +453,61 @@ class AbcConan(ConanFile):
                 "-pr:b=default",
                 ".."
             ];
-            await this.exec.exec(cmd,args,buildDir);
-            let targetFiles = fse.readdirSync(path.join(buildDir,"generators"))
+
+            await this.exec.execAsync(cmd,args,buildDir);
+            const targetFiles = fse.readdirSync(path.join(buildDir,"generators"))
                                  .filter(file => file.endsWith("Targets.cmake"));
             
-            let targets = [];    
+            const targets = [];    
             
-            for(var idx = 0; idx < targetFiles.length;idx++) {
+            for(let idx = 0; idx < targetFiles.length;idx++) {
                 
                 let targetFile = targetFiles[idx];
                 targetFile = path.basename(targetFile);
                 targetFile = targetFile.substring(0,targetFile.length-"Targets.cmake".length);
         
-                let cmakefileContent = `cmake_minimum_required(VERSION 3.15)
+                const cmakefileContent = `cmake_minimum_required(VERSION 3.15)
 project(abc CXX)
 find_package(BLABLA REQUIRED)`.replace("BLABLA",targetFile);
 
-                let cmakefilePath = path.join(path.dirname(buildDir),"CMakeLists.txt");
+                const cmakefilePath = path.join(path.dirname(buildDir),"CMakeLists.txt");
                 fse.writeFileSync(cmakefilePath,cmakefileContent);
                 args = [
                     "build",
                     ".."
                 ];
-                let target_jdx = "";
-                let targets_idx : string[] = [];
-                let results = await this.exec.execWithResult(cmd,args,buildDir);
+                let targetJdx = "";
+                let targetsIdx : string[] = [];
+                const results = await this.exec.execSyncGetFormatStdout(cmd,args,buildDir);
                 for(var jdx =0; jdx < results.length; jdx++) {
                     if (results[jdx].startsWith('-- Conan: Target declared ')) {
-                        target_jdx = results[jdx].replace('-- Conan: Target declared ','')
+                        targetJdx = results[jdx].replace('-- Conan: Target declared ','')
                                                  .replaceAll("'","");
-                        targets_idx.push(target_jdx);
-                        targets.push(target_jdx);
+                        targetsIdx.push(targetJdx);
+                        targets.push(targetJdx);
                     }
                     else if (results[jdx].startsWith('-- Conan: Component target declared ')) {
-                        target_jdx = results[jdx].replace('-- Conan: Component target declared ','')
+                        targetJdx = results[jdx].replace('-- Conan: Component target declared ','')
                                                  .replaceAll("'","");
-                        targets_idx.push(target_jdx);
-                        targets.push(target_jdx);
+                        targetsIdx.push(targetJdx);
+                        targets.push(targetJdx);
                     }
                     else {
                         // pass
                     }
                 }
-                outMap.set(targetFile,targets_idx);
+                outMap.set(targetFile,targetsIdx);
             }
 
-            let targets_txt_content = `targets of package '${packageName}' \n`;
-            if (outFile != "") {
-                let targets_txt_file = outFile;
+            let targetsTxtContent = `targets of package '${packageName}' \n`;
+            if (outFile !== "") {
+                let targetsTxtFile = outFile;
 
-                for(var idx = 0; idx < targets.length;idx++) {
-                    targets_txt_content = targets_txt_content + "- " + targets[idx] + " \n";
+                for(let idx = 0; idx < targets.length;idx++) {
+                    targetsTxtContent = targetsTxtContent + "- " + targets[idx] + " \n";
                 }
                 
-                fse.writeFileSync(targets_txt_file,targets_txt_content);
+                fse.writeFileSync(targetsTxtFile,targetsTxtContent);
             }
             // tidy up --> remove tmp conan package dir
             fse.removeSync(path.dirname(conanfilePath));
@@ -507,22 +516,22 @@ find_package(BLABLA REQUIRED)`.replace("BLABLA",targetFile);
     }
 
     public async getProjectTargets(
-        prjRoot : string,
-        outDir : string = "",
+        conanfileDir : string,
+        outDir = "",
     ) : Promise<Map<string,string[]>> {
         let outMap : Map<string,string[]> = new Map<string,string[]>();
-        let packages = await this.getProjectPackagesRecursive(prjRoot);
+        const packages = await this.getProjectPackagesRecursive(conanfileDir);
         for (var idx = 0; idx < packages.length;idx++) {
-            let package_idx = packages[idx];
-            let outMap_ = new Map<string,string[]>();
-            if (outDir != "") {
-                let outFile = path.join(outDir,"targets_" + package_idx.replaceAll("/","_").replaceAll(".","_") + ".txt");
-                outMap_ = await this.getPackageTargets(package_idx,outFile);
+            const packageIdx = packages[idx];
+            let outMap2 = new Map<string,string[]>();
+            if (outDir !== "") {
+                const outFile = path.join(outDir,"targets_" + packageIdx.replaceAll("/","_").replaceAll(".","_") + ".txt");
+                outMap2 = await this.getPkgTargets(packageIdx,outFile);
             }
             else {
-                outMap_ = await this.getPackageTargets(package_idx,"");
+                outMap2 = await this.getPkgTargets(packageIdx,"");
             }
-            outMap = new Map([...Array.from(outMap.entries()), ...Array.from(outMap_.entries())]);
+            outMap = new Map([...Array.from(outMap.entries()), ...Array.from(outMap2.entries())]);
         };
         return outMap;
     }
