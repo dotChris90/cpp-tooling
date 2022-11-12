@@ -58,10 +58,8 @@ export class Conan {
         return (["default"].concat(profiles.filter(text => text !== 'default')));
     }
 
-    public async getProjectPackagesRecursive(
-        conanfileDir : string,
-
-    ) : Promise<string[]> {
+    public async getConanfileRequirementsRecursive(
+        conanfileDir : string) : Promise<string[]> {
         const packageDot = path.join(
             fse.mkdtempSync(path.join(os.tmpdir(), 'cpp-tooling-')),
             "package.dot"
@@ -229,7 +227,7 @@ export class Conan {
         return this.exec.execAsync(cmd, args, workDir);
     }
 
-    public async getPkgDependencies(
+    public async getPkgRequirements(
         pkgName : string, 
         version : string) : Promise<string[]> {
         
@@ -257,7 +255,7 @@ export class Conan {
         return packages;
     }
 
-    public async getProjectRequirementsSync(
+    public async getConanfileRequirementsSync(
         conanfileDir : string) : Promise<string[]> {
 
         const pkgName = await this.getPkgNameAsync(conanfileDir);
@@ -446,7 +444,7 @@ class AbcConan(ConanFile):
             const buildDir = path.join(path.dirname(conanfilePath),"build");
             fse.mkdirpSync(buildDir);
 
-            let cmd = "conan";
+            const cmd = "conan";
             let args = [
                 "install",
                 "-pr:h=default",
@@ -477,7 +475,7 @@ find_package(BLABLA REQUIRED)`.replace("BLABLA",targetFile);
                     ".."
                 ];
                 let targetJdx = "";
-                let targetsIdx : string[] = [];
+                const targetsIdx : string[] = [];
                 const results = await this.exec.execSyncGetFormatStdout(cmd,args,buildDir);
                 for(var jdx =0; jdx < results.length; jdx++) {
                     if (results[jdx].startsWith('-- Conan: Target declared ')) {
@@ -501,7 +499,7 @@ find_package(BLABLA REQUIRED)`.replace("BLABLA",targetFile);
 
             let targetsTxtContent = `targets of package '${packageName}' \n`;
             if (outFile !== "") {
-                let targetsTxtFile = outFile;
+                const targetsTxtFile = outFile;
 
                 for(let idx = 0; idx < targets.length;idx++) {
                     targetsTxtContent = targetsTxtContent + "- " + targets[idx] + " \n";
@@ -515,12 +513,12 @@ find_package(BLABLA REQUIRED)`.replace("BLABLA",targetFile);
             return outMap;
     }
 
-    public async getProjectTargets(
+    public async getConanfileTargets(
         conanfileDir : string,
         outDir = "",
     ) : Promise<Map<string,string[]>> {
         let outMap : Map<string,string[]> = new Map<string,string[]>();
-        const packages = await this.getProjectPackagesRecursive(conanfileDir);
+        const packages = await this.getConanfileRequirementsRecursive(conanfileDir);
         for (var idx = 0; idx < packages.length;idx++) {
             const packageIdx = packages[idx];
             let outMap2 = new Map<string,string[]>();
