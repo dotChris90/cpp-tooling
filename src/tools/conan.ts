@@ -17,8 +17,8 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
 
-import {Executor} from './executor';
-import { InvalidDirError } from './Error/wrong-dir-error';
+import {Executor} from '../executor';
+import { InvalidDirError } from '../Error/wrong-dir-error';
 
 export class Conan {
 
