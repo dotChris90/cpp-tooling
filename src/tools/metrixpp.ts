@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-module */
 /* eslint-disable prefer-template */
 /* eslint-disable func-names */
 /* eslint-disable prefer-arrow-callback */
@@ -12,10 +13,24 @@ export class Metrixpp {
 
     private exec : Executor;
 
+    protected configContent : string;
+
     constructor(
         exec : Executor) {
         this.exec = exec;
+        this.configContent = path.join(
+            __filename,
+            "..",
+            "..",
+            "Templates",
+            "metrixpp.config"
+            );
     }
+
+    public async generateConfig(
+        configDst : string) : Promise<void> {
+            return fse.readFile(this.configContent).then( (content)=> (fse.writeFile(configDst,content)));
+        }
 
     public collect(
         configFile : string,

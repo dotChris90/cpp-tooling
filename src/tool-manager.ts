@@ -8,10 +8,17 @@ import * as fs from 'fs';
 
 import { Installer } from "./installer";
 import { ITextOutput } from "./i-text-output";
+import { Conan } from './tools/conan';
+import { Doxygen } from './tools/doxygen';
 
 import { InstallationPkg } from "./installation/installation-pkg";
+import { Executor } from './executor';
 
 export class ToolManager {
+
+    protected conan : Conan;
+
+    protected doxygen : Doxygen;
     
     protected inst : Installer;
     
@@ -19,11 +26,14 @@ export class ToolManager {
 
     protected out : ITextOutput;
 
+    protected exec : Executor;
+
     constructor(
         out : ITextOutput, 
         toolInstallPath = path.join(process.cwd(),".tools")
         ) {
             this.out = out;
+            this.exec = new Executor(this.out)
             this.inst = new Installer(this.out);
             if (!fs.existsSync(toolInstallPath)) {
                 throw new Error("Path does not exist");

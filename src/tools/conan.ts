@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-module */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable prefer-template */
 /* eslint-disable unicorn/no-for-loop */
@@ -23,11 +24,43 @@ import { InvalidDirError } from '../Error/wrong-dir-error';
 export class Conan {
 
     private exec : Executor;
+
+    protected templateDir : string;
     
     constructor(
         exec : Executor
     ) {
         this.exec = exec;
+        this.templateDir = path.join(
+            __filename,
+            "..",
+            "..",
+            "Templates",
+            "conan_new"
+            );
+    }
+
+    public async generatePkgTemplate(
+        templateName = "default",
+        conanDir = path.join(os.homedir(),".conan"),
+        overWriteExisting = true
+    ) : Promise<void> {
+        const conanTemplateLocation = path.join(
+            conanDir,
+            "templates",
+            "command",
+            "new",
+            templateName
+        );
+        if (fse.existsSync(conanTemplateLocation)) {
+            if (!overWriteExisting) {
+                throw new InvalidDirError(`Template dir ${conanTemplateLocation} already exist.`);
+            }
+            else {
+                fse.rmSync(conanTemplateLocation, { recursive: true, force: true });
+            }
+        }
+        return fse.copy(this.templateDir,conanTemplateLocation);
     }
 
     public createNewPkg(

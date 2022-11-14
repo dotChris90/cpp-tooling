@@ -1,3 +1,5 @@
+/* eslint-disable spaced-comment */
+/* eslint-disable unicorn/prefer-module */
 /* eslint-disable promise/catch-or-return */
 /* eslint-disable unicorn/import-style */
 import * as path from 'path';
@@ -21,7 +23,7 @@ export class Doxygen {
         this.exec = exec;
         this.doxygenBin = doxygenBin;
         this.doxyConfigContentPath = path.join(
-            url.fileURLToPath(import.meta.url),
+            __filename,
             "..",
             "..",
             "Templates",
@@ -30,9 +32,6 @@ export class Doxygen {
     }
 
     public generateConf(doxyConfDstFile : string) : Promise<void> {
-        if (!fse.existsSync(this.doxygenBin)) {
-            throw new InvalidDirError("doxygen bin does not exist.");
-        }
         if (!fse.existsSync(path.dirname(doxyConfDstFile))) {
             throw new InvalidDirError("Parent folder of doxyConfDstFile does not exist.");
         }
@@ -40,12 +39,16 @@ export class Doxygen {
     }
     
     public async generateDocumentation(
-        doxygenFile : string) : Promise<void> {
+        doxygenFile : string, 
+        dstDir : string) : Promise<void> {
+            
+        if (!fse.existsSync(dstDir)) {
+            throw new InvalidDirError("dstDir does not exist.");
+        }
         const cmd = this.doxygenBin;
         const args = [
             `${doxygenFile}`
         ];
-        const workDir = path.dirname(doxygenFile);
-        return this.exec.execAsync(cmd, args, workDir);
+        return this.exec.execAsync(cmd, args, dstDir);
     }
 }

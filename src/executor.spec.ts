@@ -4,10 +4,11 @@
 import * as path from 'path';
 import * as os from 'os';
 import * as fse from 'fs-extra';
+import commandExists from 'command-exists';
 
 import { Executor } from './executor';
 import { FakeOut } from './i-text-output-buffer';
-import commandExists from 'command-exists';
+
 
 describe('exec', () => {
     describe('test', () => {
