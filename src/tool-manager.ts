@@ -1,3 +1,4 @@
+/* eslint-disable promise/always-return */
 /* eslint-disable unicorn/import-style */
 import * as path from 'path';
 import * as process from 'process';
@@ -10,6 +11,8 @@ import { Installer } from "./installer";
 import { ITextOutput } from "./i-text-output";
 import { Conan } from './tools/conan';
 import { Doxygen } from './tools/doxygen';
+import { Metrixpp } from './tools/metrixpp';
+import { Clang } from './tools/clang';
 
 import { InstallationPkg } from "./installation/installation-pkg";
 import { Executor } from './executor';
@@ -19,6 +22,10 @@ export class ToolManager {
     protected conan : Conan;
 
     protected doxygen : Doxygen;
+
+    protected metrixpp : Metrixpp;
+
+    protected clang : Clang;
     
     protected inst : Installer;
     
@@ -44,7 +51,8 @@ export class ToolManager {
     public async setup() : Promise<void> {
 
         await this.inst.setup();
-        
+        this.conan = new Conan(this.exec);
+        this.clang = new Clang(this.exec,"");
     } 
 
     protected checkToolExist(toolcommand : string) : boolean {
@@ -76,10 +84,12 @@ export class ToolManager {
         else {
             const metrixPkg = new InstallationPkg();
             metrixPkg.installStrategy = "pip3";
-            metrixPkg.location = this.toolInstallPath;
+            metrixPkg.location = "global";
             metrixPkg.name = "metrixpp";
             metrixPkg.version = "1.7.1";
-            result = this.inst.installPkg(metrixPkg);
+            result = this.inst.installPkg(metrixPkg).then(  async() => {
+                this.metrixpp = new Metrixpp(this.exec);
+            });
         }
         return result;
     }
@@ -122,18 +132,25 @@ export class ToolManager {
 
     public async installDoxygen() : Promise<void> {
         let result = Promise.resolve();
+        let doxygenIsPresent = false;
+        let doxygenPath = "";
         // doxygen','1.9.1
         if (this.checkToolExist("doxygen")) {
             // pass 
+            doxygenIsPresent = true;
             this.out.writeOut("doxygen already present.");
         }
         else {
+            doxygenPath = path.join(this.toolInstallPath,"doxygen","bin","doxygen");
             const doxygenPkg = new InstallationPkg();
             doxygenPkg.installStrategy = "conan";
             doxygenPkg.location = this.toolInstallPath;
             doxygenPkg.name = "doxygen";
             doxygenPkg.version = "1.9.1";
-            result = this.inst.installPkg(doxygenPkg);
+            result = this.inst.installPkg(doxygenPkg)
+                .then( async() => {
+                    this.doxygen = (doxygenIsPresent)? new Doxygen(this.exec,"doxygen") : new Doxygen(this.exec,doxygenPath);
+                });
         }
         return result;
     }
