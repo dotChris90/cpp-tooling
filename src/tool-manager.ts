@@ -13,6 +13,9 @@ import { Conan } from './tools/conan';
 import { Doxygen } from './tools/doxygen';
 import { Metrixpp } from './tools/metrixpp';
 import { Clang } from './tools/clang';
+import { Dot } from './tools/dot';
+import { CMake } from './tools/cmake';
+import { CppCheck } from './tools/cppcheck';
 
 import { InstallationPkg } from "./installation/installation-pkg";
 import { Executor } from './executor';
@@ -26,6 +29,12 @@ export class ToolManager {
     protected metrixpp : Metrixpp;
 
     protected clang : Clang;
+
+    protected dot : Dot;
+
+    protected cmake : CMake;
+
+    protected cppcheck : CppCheck;
     
     protected inst : Installer;
     
@@ -53,6 +62,7 @@ export class ToolManager {
         await this.inst.setup();
         this.conan = new Conan(this.exec);
         this.clang = new Clang(this.exec,"");
+        this.dot = new Dot(this.exec,"");
     } 
 
     protected checkToolExist(toolcommand : string) : boolean {
@@ -75,11 +85,12 @@ export class ToolManager {
     }
 
     public async installMetrixpp() : Promise<void> {
-        let result = Promise.resolve();
         // metrixpp 1.7.1 pip3 
         if (this.checkToolExist("metrix++")) {
             // pass 
             this.out.writeOut("metrix++ already present.");
+            this.metrixpp = new Metrixpp(this.exec);
+            return Promise.resolve();            
         }
         else {
             const metrixPkg = new InstallationPkg();
@@ -87,58 +98,63 @@ export class ToolManager {
             metrixPkg.location = "global";
             metrixPkg.name = "metrixpp";
             metrixPkg.version = "1.7.1";
-            result = this.inst.installPkg(metrixPkg).then(  async() => {
+            return (this.inst.installPkg(metrixPkg).then(  async() => {
                 this.metrixpp = new Metrixpp(this.exec);
-            });
+            }));
         }
-        return result;
     }
 
     public async installCMake() : Promise<void> {
-
-        let result = Promise.resolve();
         // cmake','3.23.1
         if (this.checkToolExist("cmake")) {
             // pass 
             this.out.writeOut("cmake already present.");
+            this.cmake = new CMake(this.exec,"cmake");
+            return Promise.resolve();
         }
         else {
+            let cmakePath = path.join(this.toolInstallPath,"cmake","bin","cmake");
             const cmakePkg = new InstallationPkg();
             cmakePkg.installStrategy = "conan";
             cmakePkg.location = this.toolInstallPath;
             cmakePkg.name = "cmake";
-            result = this.inst.installPkg(cmakePkg);
+            cmakePkg.version = "3.20.5"
+            return (this.inst.installPkg(cmakePkg).then( async() => {
+                this.cmake = new CMake(this.exec,cmakePath);
+            }));
         }
-        return result;
+
     }
 
     public async installCppCheck() : Promise<void> {
-        let result = Promise.resolve();
         // cppcheck','2.7.5
          if (this.checkToolExist("cppcheck")) {
             // pass 
             this.out.writeOut("cppcheck already present.");
+            this.cppcheck = new CppCheck(this.exec,"cppcheck");
+            return Promise.resolve();
         }
         else {
+            let cppcheckPath = path.join(this.toolInstallPath,"cppcheck","bin","cppcheck");
             const cppcheckPkg = new InstallationPkg();
             cppcheckPkg.installStrategy = "conan";
             cppcheckPkg.location = this.toolInstallPath;
             cppcheckPkg.name = "cppcheck";
             cppcheckPkg.version = "2.7.5";
-            result = this.inst.installPkg(cppcheckPkg);
+            return (this.inst.installPkg(cppcheckPkg).then( async() => {
+                this.cppcheck = new CppCheck(this.exec,cppcheckPath);
+            }));
         }
-        return result;
     }
 
     public async installDoxygen() : Promise<void> {
-        let result = Promise.resolve();
-        let doxygenIsPresent = false;
         let doxygenPath = "";
         // doxygen','1.9.1
         if (this.checkToolExist("doxygen")) {
             // pass 
-            doxygenIsPresent = true;
             this.out.writeOut("doxygen already present.");
+            this.doxygen = new Doxygen(this.exec,"doxygen");
+            return Promise.resolve();
         }
         else {
             doxygenPath = path.join(this.toolInstallPath,"doxygen","bin","doxygen");
@@ -147,12 +163,10 @@ export class ToolManager {
             doxygenPkg.location = this.toolInstallPath;
             doxygenPkg.name = "doxygen";
             doxygenPkg.version = "1.9.1";
-            result = this.inst.installPkg(doxygenPkg)
-                .then( async() => {
-                    this.doxygen = (doxygenIsPresent)? new Doxygen(this.exec,"doxygen") : new Doxygen(this.exec,doxygenPath);
-                });
+            return (this.inst.installPkg(doxygenPkg).then( async() => {
+                    this.doxygen = new Doxygen(this.exec,doxygenPath);
+                }));
         }
-        return result;
     }
 
     public async installAllTools() : Promise<void[]> {
