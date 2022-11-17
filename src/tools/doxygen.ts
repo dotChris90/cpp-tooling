@@ -7,7 +7,7 @@ import * as fse from 'fs-extra';
 import * as url from 'url';
 
 import { Executor } from '../executor';
-import { InvalidDirError} from '../Error/wrong-dir-error';
+import { InvalidPathError} from '../Error/wrong-dir-error';
 
 export class Doxygen {
 
@@ -33,7 +33,7 @@ export class Doxygen {
 
     public generateConf(doxyConfDstFile : string) : Promise<void> {
         if (!fse.existsSync(path.dirname(doxyConfDstFile))) {
-            throw new InvalidDirError("Parent folder of doxyConfDstFile does not exist.");
+            throw new InvalidPathError("Parent folder of doxyConfDstFile does not exist.");
         }
         return fse.readFile(this.doxyConfigContentPath).then( (content)=> (fse.writeFile(doxyConfDstFile,content)));
     }
@@ -43,7 +43,7 @@ export class Doxygen {
         dstDir : string) : Promise<void> {
             
         if (!fse.existsSync(dstDir)) {
-            throw new InvalidDirError("dstDir does not exist.");
+            throw new InvalidPathError("dstDir does not exist.");
         }
         const cmd = this.doxygenBin;
         const args = [

@@ -14,9 +14,11 @@
     "@dotchris90/utils-extensions": "^0.0.4",
     "@types/command-exists": "^1.2.0",
     "@types/fs-extra": "^9.0.13",
+    "@types/js-yaml": "^4.0.5",
     "command-exists": "^1.2.9",
     "fs-extra": "^10.1.0",
-    "fse": "^4.0.1"
+    "fse": "^4.0.1",
+    "js-yaml": "^4.1.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.24",

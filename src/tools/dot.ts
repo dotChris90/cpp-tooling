@@ -6,7 +6,7 @@ import * as command_exist from 'command-exists';
 import * as path from 'path';
 import * as fse from 'fs-extra';
 import { Executor } from '../executor';
-import { InvalidDirError } from '../Error/wrong-dir-error';
+import { InvalidPathError } from '../Error/wrong-dir-error';
 import { CmdNotPresentError } from '../Error/command-not-present-error';
 
 export class Dot {
@@ -30,7 +30,7 @@ export class Dot {
         // it's local present
         if (this.dotBin.includes(path.sep)) {
             if (!fse.existsSync(this.dotBin)) {
-                throw new InvalidDirError(`the path ${this.dotBin} does not exist`);
+                throw new InvalidPathError(`the path ${this.dotBin} does not exist`);
             }
             else {
                 // pass

@@ -1,5 +1,8 @@
+/* eslint-disable no-plusplus */
 /* eslint-disable no-param-reassign */
-import { ValidationError } from "../Error/validation-error";
+import * as js_yaml from 'js-yaml';
+import * as fse from 'fs-extra';
+
 import { Executable } from "./executable";
 import { Library } from "./library";
 import { Option } from "./option";
@@ -31,42 +34,28 @@ export class CPSConfig {
 
     libraries : Library[] = [];
 
-    public static Validate(config : CPSConfig) : void {
-        if (config.name === undefined) {
-            config.name = "";
+    public constructor(init?: Partial<CPSConfig>) {
+        Object.assign(this, init);
+        for(let idx = 0; idx < this.packages.length;idx++) {
+            this.packages[idx] = new Package(this.packages[idx]);
         }
-        if (config.version === undefined) {
-            config.version = "";
+        for(let idx = 0; idx < this.options.length;idx++) {
+            this.options[idx] = new Option(this.options[idx]);
         }
-        if (config.buildSystem === undefined) {
-            config.buildSystem = "";
+        for(let idx = 0; idx < this.executables.length;idx++) {
+            this.executables[idx] = new Executable(this.executables[idx]);
         }
-        if (config.license === undefined) {
-            config.license = "";
+        for(let idx = 0; idx < this.libraries.length;idx++) {
+            this.libraries[idx] = new Library(this.libraries[idx]);
         }
-        if (config.author === undefined) {
-            config.author = "";
-        }
-        if (config.url === undefined) {
-            config.url = "";
-        }
-        if (config.description === undefined) {
-            config.description = "";
-        }
-        if (config.topics === undefined) {
-            config.topics = [];
-        }
-        if (config.options === undefined) {
-            config.options = [];
-        }
-        if (config.packages === undefined) {
-            config.packages = [];
-        }
-        if (config.executables === undefined) {
-            config.executables = [];
-        }
-        if (config.libraries === undefined) {
-            config.libraries = [];
-        }
-    }
+     }
+
+     public static createFromYMLFile(filePath : string) : CPSConfig {
+        const partialConfig = js_yaml.load(fse.readFileSync(filePath, 'utf8')) as CPSConfig;
+        return (new CPSConfig(partialConfig));
+     }
+
+     public static writeToYMLFile(filePath : string, config : CPSConfig) : void {
+        fse.writeFileSync(filePath, js_yaml.dump(config,{skipInvalid : true}),'utf8');
+     }
 }

@@ -57,6 +57,34 @@ export class ToolManager {
             this.toolInstallPath = toolInstallPath;
         }
 
+    public getConan() : Conan {
+        return this.conan;
+    }
+
+    public getMetrixpp() : Metrixpp {
+        return this.metrixpp;
+    }
+
+    public getClang() : Clang {
+        return this.clang;
+    }
+
+    public getCMake() : CMake {
+        return this.cmake;
+    }
+
+    public getCppCheck() : CppCheck {
+        return this.cppcheck;
+    }
+
+    public getDot() : Dot {
+        return this.dot;
+    }
+
+    public getDoxygen() : Doxygen {
+        return this.doxygen;
+    }
+
     public async setup() : Promise<void> {
 
         await this.inst.setup();
@@ -92,7 +120,7 @@ export class ToolManager {
             this.metrixpp = new Metrixpp(this.exec);
             return Promise.resolve();            
         }
-        else {
+        
             const metrixPkg = new InstallationPkg();
             metrixPkg.installStrategy = "pip3";
             metrixPkg.location = "global";
@@ -101,7 +129,7 @@ export class ToolManager {
             return (this.inst.installPkg(metrixPkg).then(  async() => {
                 this.metrixpp = new Metrixpp(this.exec);
             }));
-        }
+        
     }
 
     public async installCMake() : Promise<void> {
@@ -112,8 +140,8 @@ export class ToolManager {
             this.cmake = new CMake(this.exec,"cmake");
             return Promise.resolve();
         }
-        else {
-            let cmakePath = path.join(this.toolInstallPath,"cmake","bin","cmake");
+        
+            const cmakePath = path.join(this.toolInstallPath,"cmake","bin","cmake");
             const cmakePkg = new InstallationPkg();
             cmakePkg.installStrategy = "conan";
             cmakePkg.location = this.toolInstallPath;
@@ -122,7 +150,7 @@ export class ToolManager {
             return (this.inst.installPkg(cmakePkg).then( async() => {
                 this.cmake = new CMake(this.exec,cmakePath);
             }));
-        }
+        
 
     }
 
@@ -134,8 +162,8 @@ export class ToolManager {
             this.cppcheck = new CppCheck(this.exec,"cppcheck");
             return Promise.resolve();
         }
-        else {
-            let cppcheckPath = path.join(this.toolInstallPath,"cppcheck","bin","cppcheck");
+        
+            const cppcheckPath = path.join(this.toolInstallPath,"cppcheck","bin","cppcheck");
             const cppcheckPkg = new InstallationPkg();
             cppcheckPkg.installStrategy = "conan";
             cppcheckPkg.location = this.toolInstallPath;
@@ -144,7 +172,7 @@ export class ToolManager {
             return (this.inst.installPkg(cppcheckPkg).then( async() => {
                 this.cppcheck = new CppCheck(this.exec,cppcheckPath);
             }));
-        }
+        
     }
 
     public async installDoxygen() : Promise<void> {
@@ -156,7 +184,7 @@ export class ToolManager {
             this.doxygen = new Doxygen(this.exec,"doxygen");
             return Promise.resolve();
         }
-        else {
+        
             doxygenPath = path.join(this.toolInstallPath,"doxygen","bin","doxygen");
             const doxygenPkg = new InstallationPkg();
             doxygenPkg.installStrategy = "conan";
@@ -166,7 +194,7 @@ export class ToolManager {
             return (this.inst.installPkg(doxygenPkg).then( async() => {
                     this.doxygen = new Doxygen(this.exec,doxygenPath);
                 }));
-        }
+        
     }
 
     public async installAllTools() : Promise<void[]> {

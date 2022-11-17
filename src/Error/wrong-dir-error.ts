@@ -1,8 +1,8 @@
-export class InvalidDirError extends Error {
+export class InvalidPathError extends Error {
 
     constructor(message: string) {
         super(message);
     
-        Object.setPrototypeOf(this, InvalidDirError.prototype);
+        Object.setPrototypeOf(this, InvalidPathError.prototype);
       }
 }

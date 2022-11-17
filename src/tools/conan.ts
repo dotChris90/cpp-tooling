@@ -19,7 +19,7 @@ import * as path from 'path';
 import * as os from 'os';
 
 import {Executor} from '../executor';
-import { InvalidDirError } from '../Error/wrong-dir-error';
+import { InvalidPathError } from '../Error/wrong-dir-error';
 
 export class Conan {
 
@@ -54,7 +54,7 @@ export class Conan {
         );
         if (fse.existsSync(conanTemplateLocation)) {
             if (!overWriteExisting) {
-                throw new InvalidDirError(`Template dir ${conanTemplateLocation} already exist.`);
+                throw new InvalidPathError(`Template dir ${conanTemplateLocation} already exist.`);
             }
             else {
                 fse.rmSync(conanTemplateLocation, { recursive: true, force: true });
@@ -150,10 +150,10 @@ export class Conan {
         installDir : string) : Promise<void> {
         
         if (!fse.readdirSync(conanfileDir).includes("conanfile.py")) {
-            throw new InvalidDirError("conanfileDir does not contain conanfile.py.");
+            throw new InvalidPathError("conanfileDir does not contain conanfile.py.");
         }
         if (!fse.existsSync(installDir)) {
-            throw new InvalidDirError("installDir does not exist.");
+            throw new InvalidPathError("installDir does not exist.");
         }
 
         const cmd = "conan";
@@ -176,10 +176,10 @@ export class Conan {
         installDir : string) : Promise<void> {
 
         if (!fse.readdirSync(conanfileDir).includes("conanfile.py")) {
-            throw new InvalidDirError("conanfileDir does not contain conanfile.py.");
+            throw new InvalidPathError("conanfileDir does not contain conanfile.py.");
         }
         if (!fse.existsSync(installDir)) {
-            throw new InvalidDirError("installDir does not exist.");
+            throw new InvalidPathError("installDir does not exist.");
         }
     
         const cmd = "conan";
@@ -202,7 +202,7 @@ export class Conan {
         installDir: string) : Promise<void> {
         
         if (!fse.existsSync(installDir)) {
-            throw new InvalidDirError("installDir does not exist.");
+            throw new InvalidPathError("installDir does not exist.");
         }
 
         const cmd = "conan";
@@ -221,10 +221,10 @@ export class Conan {
         buildDir: string) : Promise<void> {
     
         if (!fse.existsSync(conanfileDir)) {
-            throw new InvalidDirError("conanfileDir does not exist.");
+            throw new InvalidPathError("conanfileDir does not exist.");
         }
         if (!fse.existsSync(buildDir)) {
-            throw new InvalidDirError("buildDir does not exist.");
+            throw new InvalidPathError("buildDir does not exist.");
         }
 
         const cmd = "conan";
@@ -242,7 +242,7 @@ export class Conan {
         conanfileDir : string) : Promise<void> {
 
         if (!fse.existsSync(conanfileDir)) {
-            throw new InvalidDirError("conanfileDir does not exist.");
+            throw new InvalidPathError("conanfileDir does not exist.");
         }
     
         const cmd = "conan";

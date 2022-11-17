@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 
 import { Executor } from '../executor';
-import { InvalidDirError} from '../Error/wrong-dir-error';
+import { InvalidPathError} from '../Error/wrong-dir-error';
 
 export class Clang {
 
@@ -31,7 +31,7 @@ export class Clang {
 
     public generateClangTidy(clangTidyDst : string) : Promise<void> {
         if (!fse.existsSync(path.dirname(clangTidyDst))) {
-            throw new InvalidDirError("Parent folder of clangTidyDst does not exist.");
+            throw new InvalidPathError("Parent folder of clangTidyDst does not exist.");
         }
         const clangTidyContent = path.join(this.clangTemplateDir,".clang-tidy");
         return fse.readFile(clangTidyContent).then( (content)=> (fse.writeFile(clangTidyDst,content)));
@@ -39,7 +39,7 @@ export class Clang {
 
     public generateClangFormat(clangFormatDst : string) : Promise<void> {
         if (!fse.existsSync(path.dirname(clangFormatDst))) {
-            throw new InvalidDirError("Parent folder of clangFormatDst does not exist.");
+            throw new InvalidPathError("Parent folder of clangFormatDst does not exist.");
         }
         const clangFormatContent = path.join(this.clangTemplateDir,".clang-format");
         return fse.readFile(clangFormatContent).then( (content)=> (fse.writeFile(clangFormatDst,content)));
