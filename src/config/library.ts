@@ -6,6 +6,8 @@ export class Library {
 
     inc : string[] = [];
 
+    req : string[] = [];
+
     public constructor(init?: Partial<Library>) {
         Object.assign(this, init);
      }

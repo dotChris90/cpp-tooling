@@ -4,7 +4,7 @@ export class Executable {
 
     src : string[] = [];
 
-    inc : string[] = [];
+    req : string[] = [];
 
     public constructor(init?: Partial<Executable>) {
         Object.assign(this, init);
