@@ -9,7 +9,7 @@ import { CPSConfigManager } from './cps-config-manager';
 
 describe('textout', () => {
     describe('test', () => {
-        it('should parse yml file', async() => {
+        it('if it parse yml file and write 2nd one then content same', async() => {
             
             const cpsFile = path.join(
                 __filename,
@@ -34,6 +34,23 @@ describe('textout', () => {
             fse.rmSync(tmpDir,{ recursive: true, force: true });
             expect(1).toBe(1);
             
+        });
+        it('shall extend file', async() => {
+            
+            const cpsFile = path.join(
+                __filename,
+                "..",
+                "..",
+                "Templates",
+                "cps.yml"
+                );
+
+            const manager = new CPSConfigManager(cpsFile);
+            manager.parse();
+
+            
+
+            expect(1).toBe(1);
         });
     });
 });
