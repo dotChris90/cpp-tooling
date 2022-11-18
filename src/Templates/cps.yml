@@ -35,5 +35,6 @@ libraries:
       - src/Greeter.cpp
     inc:
       - src/Greeter.hpp
+    req: []
     requires:
       - fmt::fmt

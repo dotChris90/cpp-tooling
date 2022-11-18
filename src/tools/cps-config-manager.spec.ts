@@ -32,7 +32,6 @@ describe('textout', () => {
             expect(fse.readFileSync(cpsFile).toString()).toBe(fse.readFileSync(cpsFile2).toString());
 
             fse.rmSync(tmpDir,{ recursive: true, force: true });
-            expect(1).toBe(1);
             
         });
         it('shall extend file', async() => {
@@ -48,7 +47,7 @@ describe('textout', () => {
             const manager = new CPSConfigManager(cpsFile);
             manager.parse();
 
-            
+
 
             expect(1).toBe(1);
         });
