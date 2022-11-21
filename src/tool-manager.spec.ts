@@ -7,7 +7,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
 
-import { FakeOut } from './i-text-output-buffer'
+import { FakeOut } from './input-output/i-text-output-buffer';
 import { ToolManager } from './tool-manager';
 
 describe('textout', () => {

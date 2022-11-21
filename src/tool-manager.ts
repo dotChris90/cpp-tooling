@@ -8,7 +8,7 @@ import * as os from 'os';
 import * as fs from 'fs';
 
 import { Installer } from "./installer";
-import { ITextOutput } from "./i-text-output";
+import { ITextOutput } from "./input-output/i-text-output";
 import { Conan } from './tools/conan';
 import { Doxygen } from './tools/doxygen';
 import { Metrixpp } from './tools/metrixpp';

@@ -5,7 +5,7 @@
 /* eslint-disable func-names */
 /* eslint-disable unicorn/no-object-as-default-parameter */
 import * as child_process from 'child_process';
-import { ITextOutput } from './i-text-output';
+import { ITextOutput } from './input-output/i-text-output';
 
 export class Executor {
 

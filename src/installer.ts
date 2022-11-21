@@ -9,7 +9,7 @@ import { ConanInstallation } from "./installation/conan-installation";
 import { PipInstallation } from "./installation/pip-installation";
 import { InstallationStrategie } from "./installation/installation-strategie";
 import { Executor } from "./executor";
-import { ITextOutput } from "./i-text-output";
+import { ITextOutput } from "./input-output/i-text-output";
 import { InstallationPkg } from "./installation/installation-pkg";
 
 function delay(ms: number) {

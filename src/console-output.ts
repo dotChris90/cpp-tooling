@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 
-import {ITextOutput} from './i-text-output';
+import {ITextOutput} from './input-output/i-text-output';
 
 export class ConsoleOutput implements ITextOutput {
     

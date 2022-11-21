@@ -1,8 +1,10 @@
+/* eslint-disable unicorn/import-style */
+/* eslint-disable unicorn/prefer-module */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-plusplus */
 import * as fse from 'fs-extra';
+import * as path from 'path';
 import '@dotchris90/utils-extensions';
-import * as utils from '@dotchris90/utils-extensions';
 import { CPSConfig } from '../config/cps-config';
 import { Option } from '../config/option';
 import { Package } from '../config/package';
@@ -41,6 +43,50 @@ export class CPSConfigManager {
         this.rmDuplicateLibs();
         this.rmDuplicateOptions();
         this.rmDuplicatePkgs();
+    }
+
+    public generateCPSFile() : void {
+        const cpsFile = path.join(
+            __filename,
+            "..",
+            "..",
+            "Templates",
+            "cps.yml"
+            );
+        const content = fse.readFileSync(cpsFile,{encoding:'utf8'});
+        fse.writeFileSync(this.filePath,content);
+    }
+
+    public getCPSFileLocation() : string {
+        return this.filePath;
+    }
+
+    public getTargetNames() : string[] {
+        const targets = [];
+        for(const lib of this.config.libraries)
+            targets.push(lib.name);
+        for(const exe of this.config.executables)
+            targets.push(exe.name);
+        return targets;
+    }
+
+    public getTarget(name : string) : Library | Executable {
+        let targetFound = false;
+        let target : Library | Executable;
+        for(const lib of this.config.libraries)
+            if (lib.name === name) {
+                targetFound = true;
+                target = lib;
+                break;
+            }
+        if (!targetFound) {
+            for(const exe of this.config.executables)
+                if (exe.name === name) {
+                    target = exe;
+                    break;
+                }
+        }
+        return target;
     }
 
     public parse() : void {
@@ -142,6 +188,24 @@ export class CPSConfigManager {
         }
         if (!isPresent)
             this.config.executables.push(exe);
+    }
+
+    public addSrcs2Target(
+        name : string,
+        srcs : string[]) : void {
+            const target = this.getTarget(name);
+            for(const src of srcs)
+                target.src.push(src);
+            target.src = target.src.copyAsSet().copyAsArray();
+        }
+
+    public rmSrcsFromTarget(
+        name : string,
+        srcs : string[]) : void {
+            const target = this.getTarget(name);
+            const srcSet = target.src.copyAsSet();
+            srcSet.delArray(srcs);
+            target.src = srcSet.copyAsArray();
     }
 
     public addSrcs2Exe(

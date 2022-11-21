@@ -1,4 +1,4 @@
-import { FakeOut } from './i-text-output-buffer'
+import { FakeOut } from './i-text-output-buffer';
 
 describe('textout', () => {
     describe('test', () => {

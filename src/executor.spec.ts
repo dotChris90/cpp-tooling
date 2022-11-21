@@ -6,8 +6,9 @@ import * as os from 'os';
 import * as fse from 'fs-extra';
 import commandExists from 'command-exists';
 
+
+import { FakeOut } from './input-output/i-text-output-buffer';
 import { Executor } from './executor';
-import { FakeOut } from './i-text-output-buffer';
 
 
 describe('exec', () => {

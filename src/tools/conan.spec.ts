@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as os from 'os';
 import * as fse from 'fs-extra';
 
-import { FakeOut } from '../i-text-output-buffer'
+import { FakeOut } from '../input-output/i-text-output-buffer'
 import { Executor } from '../executor';
 import { ToolManager } from '../tool-manager';
 import { Conan } from './conan';
