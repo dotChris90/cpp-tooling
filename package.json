@@ -3,6 +3,9 @@
   "version": "0.0.4",
   "description": "API to access conan, cmake, dot, doxygen, etc.",
   "main": "dist/cpp-tooling.js",
+  "bin": {
+    "cps": "dist/main.js"
+  },
   "umd:main": "dist/cpp-tooling.umd.js",
   "module": "dist/cpp-tooling.mjs",
   "files": [
@@ -17,6 +20,7 @@
     "@types/js-yaml": "^4.0.5",
     "@types/terminal-kit": "^2.5.0",
     "command-exists": "^1.2.9",
+    "commander": "^9.4.1",
     "fs-extra": "^10.1.0",
     "fse": "^4.0.1",
     "js-yaml": "^4.1.0",
@@ -37,12 +41,14 @@
     "jest": "^26.4.2",
     "microbundle": "^0.13.0",
     "prettier": "^2.0.4",
+    "shx": "^0.3.3",
     "ts-jest": "^26.3.0",
     "typescript": "^4.0.3"
   },
   "scripts": {
     "prepublish": "npm run build",
-    "build": "microbundle -o dist/ --sourcemap false --compress false",
+    "try": "node dist/main.js",
+    "build": "shx rm -rf dist && tsc -b",
     "dev": "microbundle watch -o dist/ --sourcemap false --compress false",
     "test": "jest --coverage --silent=false",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx ."
