@@ -14,8 +14,9 @@
             "request": "launch",
             "name": "Launch cps",
             "stopOnEntry": true,
-            "program": "${workspaceFolder}/src/main.ts",
-            "preLaunchTask": "tsc: build - tsconfig.json",
+            "program": "${workspaceFolder}/src/cps.ts",
+            "args": ["init"],
+            "preLaunchTask": "npm: build",
             "outFiles": ["${workspaceFolder}/dist/**/*.js"]
           }
     ]

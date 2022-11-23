@@ -47,6 +47,7 @@
   },
   "scripts": {
     "prepublish": "npm run build",
+    "debug": "tsc --sourcemap",
     "try": "node dist/main.js",
     "build": "shx rm -rf dist && tsc -b",
     "dev": "microbundle watch -o dist/ --sourcemap false --compress false",
