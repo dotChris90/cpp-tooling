@@ -6,7 +6,13 @@ import { ITextInput } from "./i-text-input";
 export class TerminalInput implements ITextInput {
 
     readInput(question: string, placeHolder: string): Promise<string> {
-        return terminal.inputField({default : placeHolder},() => terminal.green(question)).promise;
+        terminal.green(question);
+        return new Promise<string>((resolve) => {
+            terminal.inputField({default : placeHolder},( error , input ) => {
+                terminal.nextLine(1);
+                resolve(input)
+            });
+        });
     }
     
     pickFromList(question: string, list: string[]): Promise<string> {

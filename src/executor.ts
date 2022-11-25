@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/dot-notation */
 /* eslint-disable no-param-reassign */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -21,7 +22,7 @@ export class Executor {
     workingDir = "", 
     options : child_process.ExecSyncOptionsWithStringEncoding = {encoding : "utf8"}
     ) : string[]{
-        this.output.clear();
+      
         const CWD = workingDir === "" ? process.cwd() : workingDir;
         const options2 = options;
         options2.cwd = CWD;
@@ -44,7 +45,7 @@ export class Executor {
         let out = "";
         out = child_process.spawnSync(command,args,options2).stdout.toString();
         const bufferSplitted = out.split("\n").filter(text => text !== '');
-        const bufferPromise: Promise<string[]> = new Promise((resolve, reject) => resolve(bufferSplitted));
+        const bufferPromise: Promise<string[]> = new Promise((resolve) => resolve(bufferSplitted));
         return bufferPromise;
   }
 

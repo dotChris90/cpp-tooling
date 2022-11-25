@@ -15,6 +15,7 @@ import { ITextOutput } from '../input-output/i-text-output';
 import { CPSConfigManager } from './cps-config-manager';
 import { ITextInput } from '../input-output/i-text-input';
 import { InvalidPathError } from '../Error/wrong-dir-error';
+import { Conan } from './conan';
 
 export class CppProjectSupport {
 
@@ -33,21 +34,41 @@ export class CppProjectSupport {
         const tmpDir = fse.mkdtempSync(path.join(os.tmpdir(), "cps_"));
         fse.mkdirpSync(tmpDir);
 
-        this.toolMng = new ToolManager(this.out,tmpDir);
-        this.projectFileParser = new CPSConfigManager(path.join(tmpDir,"cps.yml"));
-
         this.out = output;
         this.in = input;
+
+        this.toolMng = new ToolManager(this.out,tmpDir);
+        this.projectFileParser = new CPSConfigManager(path.join(tmpDir,"cps.yml"));
     }
 
 
-    public async apiInitProject() : Promise<void> {
-        const name = await this.in.readInput("Project name (package name) :","abc");
-        const version = await this.in.readInput("Version :","0.1.0");
-        const template = await this.in.readInput("template :","default");
-        const location = await this.in.readInput("Location :",process.cwd());
+    public async apiInitProject(
+        prjName = "",
+        prjVersion = "",
+        prjPkgMng = "",
+        prjTemplate = "",
+        prjBuild = "",
+        prjDst = "",
+        all = true) : Promise<void> {
 
-        return this.initProject(name,version,template,location);
+        const templateDir = path.join(
+                os.homedir(),
+                ".conan",
+                "templates",
+                "command",
+                "new"
+        );
+        
+        const templates = fse.readdirSync(templateDir);
+        
+        const name      = (prjName === "")      ? await this.in.readInput("Project name (package name) : ","abc") : prjName;
+        const version   = (prjVersion === "")   ? await this.in.readInput("Version :","0.1.0")                    : prjVersion;
+        const location  = (prjDst === "")       ? await this.in.readInput("Location :",process.cwd())             : prjDst;
+        const template  = (prjTemplate === "")  ? await this.in.pickFromList("template :",templates)              : prjTemplate;
+        
+        this.out.clear();
+
+        return this.initProject(name,version,template,location,all).then( ()=> this.out.writeOut("Project generation completed."));
     }
 
     public async apiInitDoygen() : Promise<void> {
@@ -67,14 +88,17 @@ export class CppProjectSupport {
     }
 
     public async initCppProjectSupport(
-        cpsFileLocation : string) : Promise<void> {
+        cpsFileLocation : string, 
+        installTools = true) : Promise<void> {
 
-        this.toolMng = new ToolManager(this.out,path.join(path.dirname(cpsFileLocation),".tools"));
+        const toolPath = path.join(path.dirname(cpsFileLocation),".tools");
+        fse.mkdirpSync(toolPath);
+
+        this.toolMng = new ToolManager(this.out,toolPath);
         this.projectFileParser = new CPSConfigManager(cpsFileLocation);
         this.projectFileParser.generateCPSFile();
 
-        return this.toolMng.setup();                ;
-        
+        return installTools ? this.toolMng.setup() : Promise.resolve();                ;
     }
 
     public async generateDefaultTemplate() : Promise<void> {
@@ -90,8 +114,18 @@ export class CppProjectSupport {
         name : string,
         version : string, 
         template : string, 
-        location : string) : Promise<void> {
+        location : string,
+        installTools = true) : Promise<void> {
         
+        fse.mkdirpSync(location);
+
+        this.out.writeOut("|------------------------------------|")
+        this.out.writeOut(" Creating project with data :       ")
+        this.out.writeOut(` - name : ${name}`)
+        this.out.writeOut(` - version : ${version}`)
+        this.out.writeOut(` - template : ${template}`)
+        this.out.writeOut(` - location : ${location}`)
+        this.out.writeOut("|------------------------------------|")
         
         const clangTidyLocation = path.join(location,".clang-tidy");
         const clangFormatLocation = path.join(location,".clang-format");
@@ -100,11 +134,26 @@ export class CppProjectSupport {
         const cpsFileLocation = path.join(location,"cps.yml");
 
         return this.toolMng.getConan().createNewPkg(name,version,template,location)
-                .then( () => this.toolMng.getClang().generateClangFormat(clangFormatLocation))
-                .then( () => this.toolMng.getClang().generateClangTidy(clangTidyLocation))
-                .then( () => this.toolMng.getDoxygen().generateConf(doxygenLocation))
-                .then( () => this.toolMng.getMetrixpp().generateConfig(metrixppLocation))
-                .then( () => this.initCppProjectSupport(cpsFileLocation));
+                .then( () => {
+                    this.out.writeOut(`Generat .clang-format at ${clangFormatLocation}`);
+                    return this.toolMng.getClang().generateClangFormat(clangFormatLocation);
+                    })
+                .then( () => {
+                    this.out.writeOut(`Generat .clang-tidy at ${clangTidyLocation}`);
+                    return this.toolMng.getClang().generateClangTidy(clangTidyLocation);
+                })
+                .then( () => {
+                    this.out.writeOut(`Generat doxy.conf at ${doxygenLocation}`);
+                    return this.toolMng.getDoxygen().generateConf(doxygenLocation);
+                })
+                .then( () => {
+                    this.out.writeOut(`Generat metrixpp.config at ${metrixppLocation}`);
+                    return this.toolMng.getMetrixpp().generateConfig(metrixppLocation);
+                })
+                .then( () => {
+                    this.out.writeOut(`Generat cps file at ${cpsFileLocation}`);
+                    return this.initCppProjectSupport(cpsFileLocation,installTools);
+                })
     }
 
     public async addSourcesToTarget() : Promise<void> {

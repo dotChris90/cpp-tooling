@@ -56,22 +56,20 @@ export class Installer {
     public async installPkg(pkg : InstallationPkg) : Promise<void> {
         if (["pip3","conan"].includes(pkg.installStrategy)) {
             if (pkg.location === "global") {
-                this.strategies.get(pkg.installStrategy).installGlobal(
+                this.out.writeOut(`Installing ${pkg.name} - global`);
+                return (this.strategies.get(pkg.installStrategy).installGlobal(
                     pkg.name,
                     pkg.version
-                );
+                ));
             }
-            else {
-                this.strategies.get(pkg.installStrategy).installIAtLocation(
+            this.out.writeOut(`Installing ${pkg.name} - local to ${pkg.location}`);
+            return (this.strategies.get(pkg.installStrategy).installIAtLocation(
                     pkg.name,
                     pkg.version,
                     pkg.location
-                );
-            }
+                ));
         }
-        else {
-            throw new Error("no valid pkg strategy");
-        }
+        throw new Error("no valid pkg strategy");
     }
 
 }

@@ -51,6 +51,18 @@ export class ToolManager {
             this.out = out;
             this.exec = new Executor(this.out)
             this.inst = new Installer(this.out);
+            
+            // have to init conan, clang, dot here 
+            // so they are not null
+            // otherwise most new project stuff do not work
+            this.conan      = new Conan(this.exec);
+            this.clang      = new Clang(this.exec,"");
+            this.dot        = new Dot(this.exec,"");
+            this.doxygen    = new Doxygen(this.exec,"");
+            this.metrixpp   = new Metrixpp(this.exec);
+            this.cppcheck   = new CppCheck(this.exec,"");
+            this.cmake      = new CMake(this.exec,"");
+
             if (!fs.existsSync(toolInstallPath)) {
                 throw new Error("Path does not exist");
             }
@@ -87,10 +99,17 @@ export class ToolManager {
 
     public async setup() : Promise<void> {
 
+        this.out.writeOut("");
+        this.out.writeOut("---------------------------------------------------------------");
+        this.out.writeOut("|You have chosen to install tools - that could take some time. |");
+        this.out.writeOut("---------------------------------------------------------------")
+        this.out.writeOut("");
+
         await this.inst.setup();
-        this.conan = new Conan(this.exec);
-        this.clang = new Clang(this.exec,"");
-        this.dot = new Dot(this.exec,"");
+        this.conan  = new Conan(this.exec);
+        this.clang  = new Clang(this.exec,"");
+        this.dot    = new Dot(this.exec,"");
+        await this.installAllTools();
     } 
 
     protected checkToolExist(toolcommand : string) : boolean {
