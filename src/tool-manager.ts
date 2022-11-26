@@ -145,7 +145,7 @@ export class ToolManager {
             metrixPkg.location = "global";
             metrixPkg.name = "metrixpp";
             metrixPkg.version = "1.7.1";
-            return (this.inst.installPkg(metrixPkg).then(  async() => {
+            return (this.inst.installPkg(metrixPkg).then(  () => {
                 this.metrixpp = new Metrixpp(this.exec);
             }));
         
@@ -159,14 +159,13 @@ export class ToolManager {
             this.cmake = new CMake(this.exec,"cmake");
             return Promise.resolve();
         }
-        
             const cmakePath = path.join(this.toolInstallPath,"cmake","bin","cmake");
             const cmakePkg = new InstallationPkg();
             cmakePkg.installStrategy = "conan";
             cmakePkg.location = this.toolInstallPath;
             cmakePkg.name = "cmake";
             cmakePkg.version = "3.20.5"
-            return (this.inst.installPkg(cmakePkg).then( async() => {
+            return (this.inst.installPkg(cmakePkg).then( () => {
                 this.cmake = new CMake(this.exec,cmakePath);
             }));
         
@@ -188,7 +187,7 @@ export class ToolManager {
             cppcheckPkg.location = this.toolInstallPath;
             cppcheckPkg.name = "cppcheck";
             cppcheckPkg.version = "2.7.5";
-            return (this.inst.installPkg(cppcheckPkg).then( async() => {
+            return (this.inst.installPkg(cppcheckPkg).then( () => {
                 this.cppcheck = new CppCheck(this.exec,cppcheckPath);
             }));
         
@@ -210,7 +209,7 @@ export class ToolManager {
             doxygenPkg.location = this.toolInstallPath;
             doxygenPkg.name = "doxygen";
             doxygenPkg.version = "1.9.1";
-            return (this.inst.installPkg(doxygenPkg).then( async() => {
+            return (this.inst.installPkg(doxygenPkg).then( () => {
                     this.doxygen = new Doxygen(this.exec,doxygenPath);
                 }));
         

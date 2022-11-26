@@ -25,9 +25,8 @@ describe('textout', () => {
 
             await manager.installCMake();
 
-            console.log("---------------------------------tool-manager out -------------")
-            console.log(out.bufferOut);
             
+
             expect(out.bufferErr.length).toBe(0);
             expect(out.bufferOut.length).not.toBe(0);
 

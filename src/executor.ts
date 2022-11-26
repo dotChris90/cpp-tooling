@@ -65,7 +65,11 @@ export class Executor {
         this.output.writeOut(data.toString());
       });
       commandProc.stderr.on("data", (data) => {
-        this.output.writeErr(data.toString());
+        const msg = data.toString() as string;
+        if(msg.includes("WARN"))
+          this.output.writeWarn(msg);
+        else
+          this.output.writeErr(msg);
       });
       commandProc.on('exit', function (code) {
         // *** Process completed
