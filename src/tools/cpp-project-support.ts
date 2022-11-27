@@ -1,3 +1,6 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-param-reassign */
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable no-plusplus */
 /* eslint-disable unicorn/prefer-string-slice */
 /* eslint-disable spaced-comment */
@@ -16,6 +19,8 @@ import { CPSConfigManager } from './cps-config-manager';
 import { ITextInput } from '../input-output/i-text-input';
 import { InvalidPathError } from '../Error/wrong-dir-error';
 import { Conan } from './conan';
+import { TerminalInput } from '../input-output/terminal-input';
+import { TerminalOutput } from '../input-output/terminal-output';
 
 export class CppProjectSupport {
 
@@ -39,6 +44,81 @@ export class CppProjectSupport {
 
         this.toolMng = new ToolManager(this.out,tmpDir);
         this.projectFileParser = new CPSConfigManager(path.join(tmpDir,"cps.yml"));
+    }
+
+    public async apiInstallPkgs(
+        projectFile = "",
+        profile = "",
+        buildType = "",
+        buildDst = "",
+        importPkg = true,
+        importDst = "",
+        createHeaderFolder = true,
+        headerFolder = "",
+        includeTestDir = true) : Promise<void> {
+            
+        this.out.clear();
+        
+        if (projectFile === "") {
+            projectFile = path.join(await this.in.readInput("Choose cps.yml dir", process.cwd()),"cps.yml");
+        } 
+
+        const prjFolder = path.dirname(projectFile);
+
+        if (profile === "") {
+            const profiles = await this.toolMng.getConan().getProfiles();
+            profile = await this.in.pickFromList("Choose Profile",profiles);
+        }
+
+        if (buildType === "") {
+            buildType = await this.in.pickFromList("Choose build type",["Debug","Release"]);
+        } 
+       
+        if (buildDst === "") {
+            buildDst = await this.in.readInput("Choose build dir", path.join(prjFolder,"build"));
+        }
+        
+        fse.mkdirpSync(buildDst);
+        fse.rmSync(buildDst, {force:true,recursive:true });
+        fse.mkdirpSync(buildDst);
+
+        await this.toolMng.getConan().install(profile,"default",buildType,prjFolder,buildDst);
+
+        if (includeTestDir) {
+            const testFolder = path.join(prjFolder,"test_package");
+            await this.toolMng.getConan().install(profile,"default",buildType,testFolder,buildDst);
+        }
+            
+        if (importPkg) {
+            if (importDst === "") {
+                importDst = await this.in.readInput("Choose import pkg destination",path.join(path.dirname(projectFile),".cps","pkg"));
+            }
+            const pkgsFolder = importDst;
+            await this.toolMng.getConan().installAsDeployment(profile,"default",buildType,prjFolder,pkgsFolder);
+            if (includeTestDir) {
+                const testFolder = path.join(prjFolder,"test_package");
+                await this.toolMng.getConan().install(profile,"default",buildType,testFolder,buildDst);
+            }
+        }
+
+        if (createHeaderFolder) {
+            if (headerFolder === "") {
+                headerFolder = await this.in.readInput("Choose include folder for packages",path.join(importDst,"include"));
+            }
+            const packages = fse.readdirSync(importDst, { withFileTypes: true })
+                          .filter(dirent => dirent.isDirectory())
+                          .filter(dirent => !(dirent.name === "include"))
+                          .map(dirent => dirent.name);
+        
+            fse.mkdirpSync(headerFolder);                
+            for (const packageIdx of packages) {
+                    const includeIdx = path.join(importDst, packageIdx, "include");
+                    if (fse.existsSync(includeIdx)){
+                        fse.copySync(includeIdx,headerFolder);
+                    }
+                }
+        }
+
     }
 
 
@@ -194,6 +274,10 @@ export class CppProjectSupport {
         this.projectFileParser.rmSrcsFromTarget(selectedTargetName,selectedSrcFiles);
 
         return Promise.resolve();
+    }
+
+    public static createTerminalBased() : CppProjectSupport {
+        return (new CppProjectSupport(new TerminalInput(), new TerminalOutput()));
     }
 
 }

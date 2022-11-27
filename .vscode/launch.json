@@ -19,6 +19,6 @@
             "console": "externalTerminal",
             "preLaunchTask": "npm: build",
             "outFiles": ["${workspaceFolder}/dist/**/*.js"]
-          }
+        }
     ]
 }
