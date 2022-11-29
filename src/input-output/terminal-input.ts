@@ -5,6 +5,29 @@ import { ITextInput } from "./i-text-input";
 
 export class TerminalInput implements ITextInput {
 
+    async readInputIfNotExist(question: string, placeHolder: string, value: string): Promise<string> {
+        if (value === "") {
+            return (this.readInput(question,placeHolder));
+        }
+        return new Promise<string>( (resolve) => resolve(value));
+    }
+
+    pickFromListIfNotExist(question: string, list: string[], value: string): Promise<string> {
+        if (value === "") {
+            return (this.pickFromList(question,list));
+        }
+        return new Promise<string>( (resolve) => resolve(value));
+    
+    }
+
+    pickFromListMultiIfNotExist(question: string, list: string[], value: string[]): Promise<string[]> {
+        if (value === null || value === undefined) {
+            return (this.pickFromListMulti(question,list));
+        }
+        return new Promise<string[]>( (resolve) => resolve(value));
+        
+    }
+
     readInput(question: string, placeHolder: string): Promise<string> {
         terminal.green(question);
         return new Promise<string>((resolve) => {

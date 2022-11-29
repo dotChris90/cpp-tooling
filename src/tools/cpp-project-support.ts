@@ -51,21 +51,15 @@ export class CppProjectSupport {
         prjDst = "",
         all = true) : Promise<void> {
 
-        const templateDir = path.join(
-                os.homedir(),
-                ".conan",
-                "templates",
-                "command",
-                "new"
-        );
+        const templates = this.toolMng.getConan().getTemplates();
         
-        const templates = fse.readdirSync(templateDir);
-        
-        const name      = (prjName === "")      ? await this.in.readInput("Project name (package name) : ","abc") : prjName;
-        const version   = (prjVersion === "")   ? await this.in.readInput("Version :","0.1.0")                    : prjVersion;
-        const location  = (prjDst === "")       ? await this.in.readInput("Location :",process.cwd())             : prjDst;
-        const template  = (prjTemplate === "")  ? await this.in.pickFromList("template :",templates)              : prjTemplate;
-        
+        const name      = await this.in.readInputIfNotExist("Project name (package name) : ","abc",prjName);
+        const version   = await this.in.readInputIfNotExist("Version : ","0.1.0",prjVersion);
+        const location  = await this.in.readInputIfNotExist("Location : ",process.cwd(),prjDst);
+        const template  = await this.in.pickFromListIfNotExist("Template : ",templates,prjTemplate);
+                          await this.in.pickFromListIfNotExist("Build System :",["cmake"],prjPkgMng);
+                          await this.in.pickFromListIfNotExist("Pkg Manager :",["conan"],prjBuild);
+
         this.out.clear();
 
         return this.initProject(name,version,template,location,all).then( ()=> this.out.writeOut("Project generation completed."));
